@@ -1,11 +1,12 @@
 build:
-	echo "Compile all C code"
-	gcc -Wall -std=c99 ./src/*.c -lSDL2 -o renderer
+	echo "Create dist folder and compile all C code"
+	mkdir dist
+	gcc -Wall -std=c99 ./src/*.c -lSDL2 -o ./dist/renderer
 
 run:
-	./renderer
+	./dist/renderer
 
 clean:
-	rm renderer
+	rm -rf dist
 
 all: build run clean
