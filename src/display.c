@@ -1,5 +1,8 @@
 #include "display.h"
+#include "triangle.h"
+#include "vector.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
@@ -22,8 +25,11 @@ bool initialize_window(void) {
   SDL_DisplayMode display_mode;
   SDL_GetCurrentDisplayMode(0, &display_mode);
 
-  window_width = 800;  // display_mode.w;
-  window_height = 600; // display_mode.h;
+  // window_width = 800;  // display_mode.w;
+  // window_height = 600; // display_mode.h;
+
+  window_width = display_mode.w;
+  window_height = display_mode.h;
 
   // Create SDL window
   window =
@@ -43,7 +49,7 @@ bool initialize_window(void) {
   }
 
   // Enable this for display fullscreen
-  // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+  SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
   return true;
 }
 
@@ -105,4 +111,35 @@ void draw_rect(int x, int y, int width, int height, uint32_t color) {
       draw_pixel(current_x, current_y, color);
     }
   }
+}
+
+// Drawing line with DDA algorithm
+void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
+  int delta_x = x1 - x0;
+  int delta_y = y1 - y0;
+
+  int side_length = abs(delta_x) >= abs(delta_y) ? abs(delta_x) : abs(delta_y);
+
+  // Find how much increment in both x and y each step
+  float x_inc = delta_x / (float)side_length;
+  float y_inc = delta_y / (float)side_length;
+
+  float current_x = x0;
+  float current_y = y0;
+
+  for (int i = 0; i < side_length; i++) {
+    draw_pixel(current_x, current_y, color);
+    current_x += x_inc;
+    current_y += y_inc;
+  };
+}
+
+void draw_line_w_vec2D(vec2_t pointA, vec2_t pointB, uint32_t color) {
+  draw_line(pointA.x, pointA.y, pointB.x, pointB.y, color);
+};
+
+void draw_triangle_w_Triagnle(triangle_t t, uint32_t color) {
+  draw_line(t.points[0].x, t.points[0].y, t.points[1].x, t.points[1].y, color);
+  draw_line(t.points[1].x, t.points[1].y, t.points[2].x, t.points[2].y, color);
+  draw_line(t.points[2].x, t.points[2].y, t.points[0].x, t.points[0].y, color);
 }
