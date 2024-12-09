@@ -7,8 +7,12 @@
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
-// Declare a pointer to (the first element of) an array of uint32 elements
-// Equal to unit32[]
+// Declare a pointer
+// to (the first
+// element of) an
+// array of uint32
+// elements Equal to
+// unit32[]
 uint32_t *color_buffer = NULL;
 SDL_Texture *color_buffer_texture;
 
@@ -17,44 +21,68 @@ int window_height;
 
 bool initialize_window(void) {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-    fprintf(stderr, "Error initializing SDL\n");
+    fprintf(stderr, "Error "
+                    "initializi"
+                    "ng SDL\n");
     return false;
   }
 
-  // Use SDL to query what is the fullscreen max
+  // Use SDL to
+  // query what is
+  // the fullscreen
+  // max
   SDL_DisplayMode display_mode;
   SDL_GetCurrentDisplayMode(0, &display_mode);
 
-  // window_width = 800;  // display_mode.w;
-  // window_height = 600; // display_mode.h;
+  // window_width =
+  // 800;  //
+  // display_mode.w;
+  // window_height =
+  // 600; //
+  // display_mode.h;
 
   window_width = display_mode.w;
   window_height = display_mode.h;
 
-  // Create SDL window
+  // Create SDL
+  // window
   window =
       SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                        window_width, window_height, SDL_WINDOW_BORDERLESS);
   if (!window) {
-    fprintf(stderr, "Error creating SDL window\n");
+    fprintf(stderr, "Error "
+                    "creating "
+                    "SDL "
+                    "window\n");
     return false;
   }
 
-  // Create a SDL renderer
-  // -1 and 0 are for enable the default setting
+  // Create a SDL
+  // renderer -1 and
+  // 0 are for
+  // enable the
+  // default setting
   renderer = SDL_CreateRenderer(window, -1, 0);
   if (!renderer) {
-    fprintf(stderr, "Error creating SDL renderer\n");
+    fprintf(stderr, "Error "
+                    "creating "
+                    "SDL "
+                    "renderer"
+                    "\n");
     return false;
   }
 
-  // Enable this for display fullscreen
+  // Enable this for
+  // display
+  // fullscreen
   SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
   return true;
 }
 
 void render_color_buffer(void) {
-  // Number of bytes in row of pixel data
+  // Number of bytes
+  // in row of pixel
+  // data
   int pitch = window_width * sizeof(uint32_t);
 
   // Copy pixel(colors) data from color_buffer to color_buffer_texture
@@ -63,7 +91,10 @@ void render_color_buffer(void) {
 }
 
 void clear_color_buffer(uint32_t color) {
-  // Convert from 2D array postions to 1D array postions
+  // Convert from 2D
+  // array postions
+  // to 1D array
+  // postions
   for (int y = 0; y < window_height; y++) {
     for (int x = 0; x < window_width; x++) {
       int position = (window_width * y) + x;
@@ -73,15 +104,14 @@ void clear_color_buffer(uint32_t color) {
 }
 
 void destroy_window(void) {
-  free(color_buffer);
   SDL_DestroyWindow(window);
   SDL_DestroyRenderer(renderer);
   SDL_Quit();
 }
 
-// ---------------------- //
-// |   Draw functions   | //
-// ---------------------- //
+// ----------------------
+// |   Draw functions   |
+// ----------------------
 
 void draw_pixel(int x, int y, uint32_t color) {
   if (x < 0 || x > window_width || y < 0 || y > window_height) {
@@ -113,21 +143,26 @@ void draw_rect(int x, int y, int width, int height, uint32_t color) {
   }
 }
 
-// Drawing line with DDA algorithm
+// Drawing line with
+// DDA algorithm
 void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
   int delta_x = x1 - x0;
   int delta_y = y1 - y0;
 
-  int side_length = abs(delta_x) >= abs(delta_y) ? abs(delta_x) : abs(delta_y);
+  // clang-format off
+  int longest_side_length = abs(delta_x) >= abs(delta_y) 
+    ? abs(delta_x) 
+    : abs(delta_y);
+  // clang-format on
 
   // Find how much increment in both x and y each step
-  float x_inc = delta_x / (float)side_length;
-  float y_inc = delta_y / (float)side_length;
+  float x_inc = delta_x / (float)longest_side_length;
+  float y_inc = delta_y / (float)longest_side_length;
 
   float current_x = x0;
   float current_y = y0;
 
-  for (int i = 0; i < side_length; i++) {
+  for (int i = 0; i < longest_side_length; i++) {
     draw_pixel(current_x, current_y, color);
     current_x += x_inc;
     current_y += y_inc;
